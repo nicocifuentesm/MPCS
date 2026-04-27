@@ -1,0 +1,35 @@
+{
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/servicio-planning",
+      "destination": "/servicio-planning.html"
+    },
+    {
+      "source": "/servicio-ot",
+      "destination": "/servicio-ot.html"
+    },
+    {
+      "source": "/servicio-claimtrack",
+      "destination": "/servicio-claimtrack.html"
+    },
+    {
+      "source": "/servicio-ops",
+      "destination": "/servicio-ops.html"
+    },
+    {
+      "source": "/servicio-pagos",
+      "destination": "/servicio-pagos.html"
+    }
+  ]
+}

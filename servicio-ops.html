@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Operacional | MPCS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; background: #FAF9F6; color: #1a1a1a; overflow-x: hidden; }
+  .label-vantaz { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.25em; }
+  .heading-section { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+  .heading-hero { font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 900; line-height: 0.9; letter-spacing: -0.03em; }
+  .section-padding { padding-left: clamp(1.5rem, 4vw, 6rem); padding-right: clamp(1.5rem, 4vw, 6rem); }
+  ::selection { background: #E8631D; color: white; }
+  .img-shape { border-radius: 2rem 1rem 2.5rem 1.5rem; overflow: hidden; }
+</style>
+</head>
+<body class="antialiased">
+
+<!-- NAVBAR -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm">
+  <div class="section-padding max-w-[1400px] mx-auto flex items-center justify-between py-3">
+    <a href="/" class="flex items-center gap-2">
+      <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #0A1F44, #E8631D);">
+        <span class="text-white font-black text-lg">M</span>
+      </div>
+      <span class="font-bold text-xl tracking-tight text-[#1a1a1a]">MPCS</span>
+    </a>
+    <ul class="hidden lg:flex items-center gap-8">
+      <li><a href="/servicio-planning.html" class="text-sm font-semibold text-gray-600 hover:text-[#E8631D] transition-colors">Planificación</a></li>
+      <li><a href="/servicio-ot.html" class="text-sm font-semibold text-gray-600 hover:text-[#E8631D] transition-colors">Oficina Técnica</a></li>
+      <li><a href="/servicio-claimtrack.html" class="text-sm font-semibold text-gray-600 hover:text-[#E8631D] transition-colors">Claims</a></li>
+      <li><a href="/login.html" class="text-sm font-semibold text-white hover:text-white/80 transition-colors px-3 py-1.5 bg-[#0A1F44] rounded-lg">Demo</a></li>
+    </ul>
+    <div class="hidden lg:flex items-center gap-4">
+      <a href="/" class="text-sm font-semibold text-gray-500 hover:text-[#E8631D]">Volver</a>
+      <a href="/#contacto" class="px-5 py-2.5 bg-[#E8631D] hover:bg-[#d45516] text-white text-sm font-bold rounded-lg transition-colors">Contacto</a>
+    </div>
+    <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="lg:hidden p-2 text-[#1a1a1a]">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="mobileMenu" class="hidden lg:hidden bg-white border-t border-gray-100">
+    <div class="section-padding py-6 flex flex-col gap-4">
+      <a href="/servicio-planning.html" class="text-gray-800 font-semibold">Planificación</a>
+      <a href="/servicio-ot.html" class="text-gray-800 font-semibold">Oficina Técnica</a>
+      <a href="/servicio-claimtrack.html" class="text-gray-800 font-semibold">Claims</a>
+      <a href="/servicio-ops.html" class="text-gray-800 font-semibold">Control Operacional</a>
+      <a href="/servicio-pagos.html" class="text-gray-800 font-semibold">Control de Pagos</a>
+      <a href="/login.html" class="text-[#0A1F44] font-semibold">Demo Plataforma</a>
+      <a href="/" class="text-gray-500 font-semibold">Volver al Inicio</a>
+      <a href="/#contacto" class="px-5 py-3 bg-[#E8631D] text-white text-center font-bold rounded-lg">Contacto</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="relative min-h-[70vh] flex items-end overflow-hidden bg-[#1a1a1a] pt-20">
+  <div class="absolute inset-0 z-0">
+    <img src="/real-equipo-cascos.jpg" alt="" class="w-full h-full object-cover opacity-40" />
+    <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/50 to-transparent" />
+    <div class="absolute inset-0 bg-gradient-to-r from-[#1a1a1a]/80 via-transparent to-[#1a1a1a]/40" />
+  </div>
+  <div class="relative z-20 section-padding max-w-[1400px] mx-auto pb-20 lg:pb-28 w-full">
+    <span class="label-vantaz text-[#E8631D] mb-4 block">Servicio 04</span>
+    <h1 class="heading-hero text-white mb-4">Control<br/><span style='color:#E8631D'>Operacional</span></h1>
+    <p class="text-lg text-white/60 max-w-[600px] leading-relaxed">Blindamos la ejecución en terreno. Productividad real, wrench time y control de standby.</p>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="py-20 lg:py-28 bg-white">
+  <div class="section-padding max-w-[1400px] mx-auto">
+    <!-- Main content grid -->
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-16">
+      <div>
+        <span class="label-vantaz text-[#E8631D]">Control Operacional</span>
+        <h2 class="heading-section text-[#1a1a1a] mt-4 mb-6">Blindamos la <span style='color:#E8631D'>ejecución</span> en terreno</h2>
+        <p class="text-gray-600 text-lg leading-relaxed mb-4">Captura de datos en terreno para transformar la operación en inteligencia ejecutiva. <strong>Wrench Time, Productividad Real y Control de Standby</strong> con evidencia irrefutable.</p>
+        <p class="text-gray-500 leading-relaxed mb-8">Dejamos de depender de la percepción. Medimos con rigor lo que realmente ocurre en faena para sostener claims con datos duros.</p>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 p-3 bg-[#FAF9F6] rounded-xl border-l-4 border-[#E8631D]">
+            <span class="text-[#E8631D] font-black">01</span>
+            <span class="text-gray-700 font-semibold text-sm">Wrench Time y análisis de pérdidas</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-[#FAF9F6] rounded-xl border-l-4 border-[#E8631D]">
+            <span class="text-[#E8631D] font-black">02</span>
+            <span class="text-gray-700 font-semibold text-sm">Productividad real vs. planificada</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-[#FAF9F6] rounded-xl border-l-4 border-[#E8631D]">
+            <span class="text-[#E8631D] font-black">03</span>
+            <span class="text-gray-700 font-semibold text-sm">Control de standby y demoras</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-[#FAF9F6] rounded-xl border-l-4 border-[#E8631D]">
+            <span class="text-[#E8631D] font-black">04</span>
+            <span class="text-gray-700 font-semibold text-sm">Daily reports con evidencia fotográfica</span>
+          </div>
+        </div>
+      </div>
+      <div class="img-shape shadow-2xl">
+        <img src="/real-equipo-cascos.jpg" alt="Control Operacional Faena" class="w-full h-[400px] lg:h-[500px] object-cover" />
+      </div>
+    </div>
+    <!-- Bottom cards -->
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="p-8 rounded-2xl bg-[#FAF9F6] border border-gray-100">
+        <div class="w-12 h-12 rounded-xl bg-[#E8631D]/10 flex items-center justify-center text-[#E8631D] mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3 class="font-bold text-[#1a1a1a] mb-2">Wrench Time</h3>
+        <p class="text-gray-500 text-sm">Medición precisa del tiempo productivo vs. standby para identificar pérdidas operacionales.</p>
+      </div>
+      <div class="p-8 rounded-2xl bg-[#FAF9F6] border border-gray-100">
+        <div class="w-12 h-12 rounded-xl bg-[#E8631D]/10 flex items-center justify-center text-[#E8631D] mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        </div>
+        <h3 class="font-bold text-[#1a1a1a] mb-2">Productividad Real</h3>
+        <p class="text-gray-500 text-sm">Benchmarking de productividad por frente de trabajo con análisis de variaciones.</p>
+      </div>
+      <div class="p-8 rounded-2xl bg-[#FAF9F6] border border-gray-100">
+        <div class="w-12 h-12 rounded-xl bg-[#E8631D]/10 flex items-center justify-center text-[#E8631D] mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 class="font-bold text-[#1a1a1a] mb-2">Standby Control</h3>
+        <p class="text-gray-500 text-sm">Registro sistemático de demoras, esperas y tiempos muertos con asignación de responsabilidad.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-[#1a1a1a] border-t border-white/5">
+  <div class="section-padding max-w-[1400px] mx-auto py-16">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #0A1F44, #E8631D);">
+            <span class="text-white font-black text-lg">M</span>
+          </div>
+          <span class="text-white font-bold text-xl">MPCS</span>
+        </div>
+        <p class="text-white/40 text-sm leading-relaxed">Consultora especialista en Claim Management, Oficina Técnica y Control de Proyectos para contratistas mineros Tier-1.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Servicios</h4>
+        <ul class="space-y-3">
+          <li><a href="/servicio-planning.html" class="text-white/40 hover:text-white text-sm">Planificación P6</a></li>
+          <li><a href="/servicio-ot.html" class="text-white/40 hover:text-white text-sm">Oficina Técnica</a></li>
+          <li><a href="/servicio-claimtrack.html" class="text-white/40 hover:text-white text-sm">ClaimTrack</a></li>
+          <li><a href="/servicio-ops.html" class="text-white/40 hover:text-white text-sm">Control Operacional</a></li>
+          <li><a href="/servicio-pagos.html" class="text-white/40 hover:text-white text-sm">Control de Pagos</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Empresa</h4>
+        <ul class="space-y-3">
+          <li><a href="/" class="text-white/40 hover:text-white text-sm">Inicio</a></li>
+          <li><a href="/login.html" class="text-white/40 hover:text-white text-sm">Demo Plataforma</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Contacto</h4>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8631D" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span class="text-white/40 text-sm">Santiago, Chile</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8631D" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <a href="tel:+56912345678" class="text-white/40 hover:text-white text-sm">+56 9 1234 5678</a>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8631D" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <a href="mailto:contacto@mpcs.cl" class="text-white/40 hover:text-white text-sm">contacto@mpcs.cl</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p class="text-white/20 text-xs">&copy; 2026 MPCS Engineering & Control Solutions</p>
+      <div class="flex gap-6">
+        <a href="#" class="text-white/20 hover:text-white/50 text-xs">Privacidad</a>
+        <a href="#" class="text-white/20 hover:text-white/50 text-xs">T&eacute;rminos</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

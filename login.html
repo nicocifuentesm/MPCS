@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | MPCS Plataforma</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .shape-blob { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  .shape-blob-2 { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  .text-gradient-mpcs { background: linear-gradient(135deg, #0033A0, #1B998B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+</head>
+<body class="min-h-screen bg-[#FAF9F6] flex items-center justify-center relative overflow-hidden">
+
+<div class="absolute top-0 left-0 w-96 h-96 bg-[#0033A0]/5 shape-blob -translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute bottom-0 right-0 w-80 h-80 bg-[#E8631D]/5 shape-blob-2 translate-x-1/3 translate-y-1/3"></div>
+
+<div class="relative z-10 w-full max-w-[420px] mx-4">
+  <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 lg:p-10">
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #0033A0, #E8631D);">
+          <span class="text-white font-black text-xl">M</span>
+        </div>
+        <span class="font-bold text-2xl text-[#1a1a1a]">MPCS</span>
+      </div>
+      <p class="text-sm font-bold uppercase tracking-wider text-[#E8631D] mb-1">Plataforma</p>
+      <p class="text-gray-500 text-sm">Accede a tu panel de control de proyectos</p>
+    </div>
+
+    <form onsubmit="event.preventDefault(); window.location.href='/dashboard_app.html';" class="space-y-5">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email</label>
+        <input type="email" value="gerente.proyecto@mpcs.cl" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 font-medium focus:outline-none focus:border-[#E8631D] focus:ring-1 focus:ring-[#E8631D] transition-all" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Contraseña</label>
+        <input type="password" value="••••••••" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 font-medium focus:outline-none focus:border-[#E8631D] focus:ring-1 focus:ring-[#E8631D] transition-all" />
+      </div>
+      <div class="flex items-center justify-between text-sm">
+        <label class="flex items-center gap-2 text-gray-500 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-[#E8631D] focus:ring-[#E8631D]" />
+          Recordarme
+        </label>
+        <a href="#" class="text-[#E8631D] font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
+      </div>
+      <button type="submit" class="w-full py-4 bg-[#E8631D] hover:bg-[#d45516] text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+        Ingresar a la Plataforma
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </form>
+
+    <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+      <p class="text-gray-400 text-xs mb-3">Credenciales de demo</p>
+      <div class="flex gap-2 justify-center">
+        <span class="px-3 py-1 bg-[#0033A0]/10 text-[#0033A0] text-xs font-semibold rounded-lg">gerente.proyecto@mpcs.cl</span>
+        <span class="px-3 py-1 bg-gray-100 text-gray-500 text-xs font-semibold rounded-lg">password: demo2026</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-6">
+    <a href="/" class="text-gray-400 hover:text-[#E8631D] text-sm transition-colors">← Volver al sitio web</a>
+  </div>
+</div>
+
+</body>
+</html>

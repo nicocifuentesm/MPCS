@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard MPCS | Plataforma de Control de Proyectos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; background: #FAF9F6; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .sidebar-link { transition: all 0.2s; border-left: 3px solid transparent; }
+  .sidebar-link:hover, .sidebar-link.active { background: linear-gradient(90deg, #E8631D20, transparent); border-left-color: #E8631D; color: #E8631D; }
+  .kpi-card { transition: all 0.3s; }
+  .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+  .alert-pulse { animation: pulse-red 2s infinite; }
+  @keyframes pulse-red { 0%,100% { box-shadow: 0 0 0 0 rgba(232,99,29,0.4); } 50% { box-shadow: 0 0 0 8px rgba(232,99,29,0); } }
+  .table-row:hover { background: #FAF9F6; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  .tab-btn { transition: all 0.2s; }
+  .tab-btn:hover, .tab-btn.active { background: linear-gradient(90deg, #E8631D20, transparent); border-left-color: #E8631D; color: #E8631D; }
+</style>
+</head>
+<body class="h-screen overflow-hidden flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#1a1a1a] flex flex-col shrink-0 overflow-y-auto">
+  <div class="p-6 border-b border-white/10">
+    <a href="/" class="flex items-center gap-2">
+      <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #0A1F44, #E8631D);">
+        <span class="text-white font-black text-lg">M</span>
+      </div>
+      <div>
+        <span class="text-white font-bold text-lg block leading-none">MPCS</span>
+        <span class="text-white/40 text-[10px] uppercase tracking-wider">Plataforma</span>
+      </div>
+    </a>
+  </div>
+  
+  <nav class="flex-1 py-4 px-3">
+    <div class="mb-4 px-3">
+      <span class="text-white/30 text-[10px] font-bold uppercase tracking-wider">Proyecto</span>
+    </div>
+    <select class="w-full mb-6 px-3 py-2 bg-white/10 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-[#E8631D]">
+      <option class="text-black">Faena Los Pelambres - Mina</option>
+      <option class="text-black">Codelco División El Teniente</option>
+      <option class="text-black">BHP Spence - Expansión</option>
+      <option class="text-black">Anglo Quellaveco</option>
+    </select>
+    
+    <div class="mb-3 px-3">
+      <span class="text-white/30 text-[10px] font-bold uppercase tracking-wider">Dashboard</span>
+    </div>
+    <button onclick="showTab('overview')" id="btn-overview" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 text-sm font-medium mb-1 w-full text-left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </button>
+    <button onclick="showTab('planning')" id="btn-planning" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 text-sm font-medium mb-1 w-full text-left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Planificación
+    </button>
+    <button onclick="showTab('ot')" id="btn-ot" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 text-sm font-medium mb-1 w-full text-left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Oficina Técnica
+    </button>
+    <button onclick="showTab('claims')" id="btn-claims" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 text-sm font-medium mb-1 w-full text-left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Claims
+    </button>
+    <button onclick="showTab('ops')" id="btn-ops" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 text-sm font-medium mb-1 w-full text-left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m4.22-10.22l4.24-4.24M6.34 17.66l-4.24 4.24M23 12h-6m-6 0H1m20.24 4.24l-4.24-4.24M6.34 6.34L2.1 2.1"/></svg>
+      Operacional
+    </button>
+    <button onclick="showTab('pagos')" id="btn-pagos" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 text-sm font-medium mb-1 w-full text-left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Estados de Pago
+    </button>
+    
+    <div class="mt-6 mb-3 px-3">
+      <span class="text-white/30 text-[10px] font-bold uppercase tracking-wider">Alertas</span>
+    </div>
+    <div class="px-3 py-2 bg-red-500/10 border border-red-500/20 rounded-lg mb-2">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="w-2 h-2 rounded-full bg-red-500 alert-pulse"></span>
+        <span class="text-red-400 text-xs font-bold">3 Time-bars</span>
+      </div>
+      <p class="text-white/50 text-[10px]">Proximos a vencer en 15 dias</p>
+    </div>
+    <div class="px-3 py-2 bg-[#E8631D]/10 border border-[#E8631D]/20 rounded-lg">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="w-2 h-2 rounded-full bg-[#E8631D]"></span>
+        <span class="text-[#E8631D] text-xs font-bold">12 RFIs</span>
+      </div>
+      <p class="text-white/50 text-[10px]">Vencidos sin respuesta del mandante</p>
+    </div>
+  </nav>
+  
+  <div class="p-4 border-t border-white/10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-[#0A1F44] flex items-center justify-center text-white font-bold text-sm">GP</div>
+      <div>
+        <p class="text-white text-sm font-semibold">Gerente Proyecto</p>
+        <p class="text-white/40 text-xs">Los Pelambres - Mina</p>
+      </div>
+    </div>
+    <a href="/login.html" class="mt-3 block text-center text-white/40 hover:text-white text-xs transition-colors">Cerrar sesion</a>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 overflow-y-auto">
+  <!-- TOP BAR -->
+  <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-black text-[#1a1a1a]">Dashboard <span class="text-[#E8631D]">Overview</span></h1>
+      <p class="text-gray-400 text-xs">Actualizado: 25 Abril 2026, 14:30 hrs</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <button class="relative p-2 text-gray-400 hover:text-[#E8631D] transition-colors">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="absolute top-1 right-1 w-2 h-2 bg-[#E8631D] rounded-full"></span>
+      </button>
+      <a href="/" class="px-4 py-2 text-sm font-semibold text-gray-500 hover:text-[#E8631D] transition-colors">Sitio Web</a>
+      <a href="/#contacto" class="px-4 py-2 bg-[#E8631D] hover:bg-[#d45516] text-white text-sm font-bold rounded-lg transition-colors">Contactar Soporte</a>
+    </div>
+  </header>
+
+  <!-- CONTENT AREA -->
+  <div class="p-6 max-w-[1400px] mx-auto">
+    <!-- TAB: OVERVIEW -->
+    <div id="tab-overview" class="tab-content">
+      <!-- KPI ROW -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="kpi-card bg-white rounded-xl p-5 border border-gray-100">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">SPI</span>
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded">+2.3%</span>
+          </div>
+          <p class="mono text-3xl font-black text-[#0A1F44]">0.94</p>
+          <p class="text-gray-400 text-xs mt-1">Schedule Performance Index</p>
+        </div>
+        <div class="kpi-card bg-white rounded-xl p-5 border border-gray-100">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">CPI</span>
+            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded">-4.1%</span>
+          </div>
+          <p class="mono text-3xl font-black text-[#E8631D]">0.87</p>
+          <p class="text-gray-400 text-xs mt-1">Cost Performance Index</p>
+        </div>
+        <div class="kpi-card bg-white rounded-xl p-5 border border-gray-100">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Margen</span>
+            <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">Alerta</span>
+          </div>
+          <p class="mono text-3xl font-black text-[#1a1a1a]">12.3%</p>
+          <p class="text-gray-400 text-xs mt-1">vs. 18.5% baseline</p>
+        </div>
+        <div class="kpi-card bg-white rounded-xl p-5 border border-gray-100">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Claims Activos</span>
+            <span class="px-2 py-0.5 bg-[#0A1F44]/10 text-[#0A1F44] text-[10px] font-bold rounded">5 abiertos</span>
+          </div>
+          <p class="mono text-3xl font-black text-[#0A1F44]">US$ 4.8M</p>
+          <p class="text-gray-400 text-xs mt-1">Valor total en negociacion</p>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="grid lg:grid-cols-3 gap-6 mb-6">
+        <div class="lg:col-span-2 bg-white rounded-xl p-5 border border-gray-100">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-[#1a1a1a]">Curva S - Avance Fisico vs. Programado</h3>
+            <select class="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1">
+              <option>Ultimos 12 meses</option>
+              <option>Ultimos 6 meses</option>
+            </select>
+          </div>
+          <div style="height: 200px;"><canvas id="curvaSChart"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Status Claims</h3>
+          <div style="height: 200px;"><canvas id="claimsPieChart"></canvas></div>
+          <div class="mt-4 space-y-2">
+            <div class="flex justify-between text-xs"><span class="text-gray-500">Presentados</span><span class="font-bold text-[#0A1F44]">US$ 3.2M</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">En Negociacion</span><span class="font-bold text-[#E8631D]">US$ 1.6M</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">Aprobados</span><span class="font-bold text-emerald-600">US$ 2.1M</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">SPI / CPI Trend</h3>
+          <div style="height: 180px;"><canvas id="spitrendChart"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Margen Operacional Mensual</h3>
+          <div style="height: 180px;"><canvas id="margenChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="bg-white rounded-xl p-5 border border-gray-100 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-[#1a1a1a] flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+            Alertas Contractuales
+          </h3>
+          <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">7 activas</span>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-4 p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-bold text-red-700">Time-bar: Evento Stand-by Eq. Pesado</p>
+              <p class="text-xs text-red-500">Vence en 8 dias - US$ 1.2M en riesgo</p>
+            </div>
+            <span class="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-lg">URGENTE</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 bg-amber-50 rounded-lg border-l-4 border-amber-500">
+            <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-bold text-amber-700">CPI bajo 0.90 por 3 semanas consecutivas</p>
+              <p class="text-xs text-amber-500">Desviacion de costos acumulada: US$ 450K</p>
+            </div>
+            <span class="px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-lg">WARNING</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 bg-[#0A1F44]/5 rounded-lg border-l-4 border-[#0A1F44]">
+            <div class="w-10 h-10 rounded-lg bg-[#0A1F44]/10 flex items-center justify-center text-[#0A1F44] shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-bold text-[#0A1F44]">12 RFIs vencidos sin respuesta del mandante</p>
+              <p class="text-xs text-gray-500">Impacto potencial en critical path</p>
+            </div>
+            <span class="px-3 py-1 bg-[#0A1F44] text-white text-xs font-bold rounded-lg">INFO</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLAIMS TABLE -->
+      <div class="bg-white rounded-xl p-5 border border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-[#1a1a1a]">Claims Activos</h3>
+          <button onclick="showTab('claims')" class="text-[#E8631D] text-sm font-semibold hover:underline">Ver todos →</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-100">
+                <th class="pb-3">ID</th>
+                <th class="pb-3">Descripcion</th>
+                <th class="pb-3">Tipo</th>
+                <th class="pb-3">Monto</th>
+                <th class="pb-3">Status</th>
+                <th class="pb-3">Dias</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-600">
+              <tr class="table-row border-b border-gray-50">
+                <td class="py-3 font-mono text-xs text-[#0A1F44] font-bold">CLM-2026-004</td>
+                <td class="py-3">Stand-by equipos pesados por liberacion topografica</td>
+                <td class="py-3"><span class="px-2 py-0.5 bg-[#E8631D]/10 text-[#E8631D] text-[10px] font-bold rounded">Delay</span></td>
+                <td class="py-3 font-mono font-bold">US$ 1.2M</td>
+                <td class="py-3"><span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">En negociacion</span></td>
+                <td class="py-3 font-mono">8</td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="py-3 font-mono text-xs text-[#0A1F44] font-bold">CLM-2026-003</td>
+                <td class="py-3">Perdida de productividad por acceso restringido</td>
+                <td class="py-3"><span class="px-2 py-0.5 bg-[#0A1F44]/10 text-[#0A1F44] text-[10px] font-bold rounded">Disruption</span></td>
+                <td class="py-3 font-mono font-bold">US$ 850K</td>
+                <td class="py-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded">Aprobado</span></td>
+                <td class="py-3 font-mono">45</td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="py-3 font-mono text-xs text-[#0A1F44] font-bold">CLM-2026-005</td>
+                <td class="py-3">Variacion de cantidades en cubicacion</td>
+                <td class="py-3"><span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-bold rounded">Variation</span></td>
+                <td class="py-3 font-mono font-bold">US$ 420K</td>
+                <td class="py-3"><span class="px-2 py-0.5 bg-[#E8631D]/10 text-[#E8631D] text-[10px] font-bold rounded">Presentado</span></td>
+                <td class="py-3 font-mono">12</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- TAB: PLANNING -->
+    <div id="tab-planning" class="tab-content hidden">
+      <div class="grid lg:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Duracion Total</span>
+          <p class="mono text-2xl font-black text-[#0A1F44] mt-2">540 dias</p>
+          <p class="text-gray-400 text-xs mt-1">vs. 480 dias baseline (+12.5%)</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Ruta Critica</span>
+          <p class="mono text-2xl font-black text-[#E8631D] mt-2">8 actividades</p>
+          <p class="text-gray-400 text-xs mt-1">3 con desviacion >5 dias</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Float Total</span>
+          <p class="mono text-2xl font-black text-[#1a1a1a] mt-2">-12 dias</p>
+          <p class="text-red-500 text-xs mt-1 font-semibold">Proyecto en riesgo de atraso</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-100 mb-6">
+        <h3 class="font-bold text-[#1a1a1a] mb-4">Gantt - Avance por Disciplina</h3>
+        <div style="height: 220px;"><canvas id="ganttChart"></canvas></div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Hitos Contractuales</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 border-l-4 border-emerald-500">
+              <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs font-bold">OK</div>
+              <div class="flex-1"><p class="text-sm font-semibold text-emerald-700">Movimiento de Tierra 100%</p><p class="text-xs text-emerald-500">Completado - 15 Ene 2026</p></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-amber-50 border-l-4 border-amber-500">
+              <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 text-xs font-bold">!</div>
+              <div class="flex-1"><p class="text-sm font-semibold text-amber-700">Fundaciones 78%</p><p class="text-xs text-amber-500">Retraso 12 dias - ETC: 15 May</p></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-red-50 border-l-4 border-red-500">
+              <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs font-bold">X</div>
+              <div class="flex-1"><p class="text-sm font-semibold text-red-700">Montaje Estructural 45%</p><p class="text-xs text-red-500">Retraso 28 dias - Bloqueado por RFI</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Fragnet para TIA</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+              <thead><tr class="text-gray-400 uppercase tracking-wider border-b border-gray-100"><th class="pb-2">Evento</th><th class="pb-2">Inicio</th><th class="pb-2">Fin</th><th class="pb-2">Impacto</th></tr></thead>
+              <tbody class="text-gray-600">
+                <tr class="border-b border-gray-50"><td class="py-2">Liberacion topo retrasada</td><td class="py-2 font-mono">12 Ene</td><td class="py-2 font-mono">28 Feb</td><td class="py-2 text-[#E8631D] font-bold">+48 dias</td></tr>
+                <tr class="border-b border-gray-50"><td class="py-2">Cambio diseno cimentacion</td><td class="py-2 font-mono">05 Feb</td><td class="py-2 font-mono">20 Mar</td><td class="py-2 text-[#E8631D] font-bold">+35 dias</td></tr>
+                <tr class="border-b border-gray-50"><td class="py-2">Stand-by equipo perforacion</td><td class="py-2 font-mono">01 Mar</td><td class="py-2 font-mono">15 Mar</td><td class="py-2 text-[#E8631D] font-bold">+14 dias</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: OT -->
+    <div id="tab-ot" class="tab-content hidden">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">RFIs Total</span><p class="mono text-2xl font-black text-[#0A1F44] mt-2">124</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Pendientes</span><p class="mono text-2xl font-black text-[#E8631D] mt-2">38</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Submittals</span><p class="mono text-2xl font-black text-[#1B998B] mt-2">86</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Dossier %</span><p class="mono text-2xl font-black text-[#1a1a1a] mt-2">72%</p></div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">RFI Status</h3>
+          <div style="height: 200px;"><canvas id="rfiChart"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Submittal Workflow</h3>
+          <div style="height: 200px;"><canvas id="submittalChart"></canvas></div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-100">
+        <h3 class="font-bold text-[#1a1a1a] mb-4">RFIs Vencidos - Requieren Escalamiento</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-100"><th class="pb-3">ID RFI</th><th class="pb-3">Descripcion</th><th class="pb-3">Disciplina</th><th class="pb-3">Dias Vencido</th><th class="pb-3">Impacto</th></tr></thead>
+            <tbody class="text-gray-600">
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs font-bold text-[#0A1F44]">RFI-456</td><td class="py-3">Confirmacion especificacion acero estructural</td><td class="py-3">Estructural</td><td class="py-3 text-red-600 font-bold">18 dias</td><td class="py-3"><span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded">Bloquea montaje</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs font-bold text-[#0A1F44]">RFI-442</td><td class="py-3">Cambio routing cableado electrico</td><td class="py-3">Electrico</td><td class="py-3 text-red-600 font-bold">12 dias</td><td class="py-3"><span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">Riesgo delay</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs font-bold text-[#0A1F44]">RFI-438</td><td class="py-3">Aprobacion dibujo isometrico tuberias</td><td class="py-3">Mecanico</td><td class="py-3 text-amber-600 font-bold">8 dias</td><td class="py-3"><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-bold rounded">Monitorear</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CLAIMS -->
+    <div id="tab-claims" class="tab-content hidden">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Total Claims</span><p class="mono text-2xl font-black text-[#0A1F44] mt-2">US$ 8.7M</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Aprobados</span><p class="mono text-2xl font-black text-emerald-600 mt-2">US$ 2.1M</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">En Negociacion</span><p class="mono text-2xl font-black text-[#E8631D] mt-2">US$ 4.8M</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Success Rate</span><p class="mono text-2xl font-black text-[#1a1a1a] mt-2">84%</p></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-100 mb-6">
+        <h3 class="font-bold text-[#1a1a1a] mb-4">Evolucion Claims 2024-2026</h3>
+        <div style="height: 180px;"><canvas id="claimsTrendChart"></canvas></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-100">
+        <h3 class="font-bold text-[#1a1a1a] mb-4">Detalle de Claims por Estado</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-100"><th class="pb-3">ID</th><th class="pb-3">Descripcion</th><th class="pb-3">Tipo</th><th class="pb-3">Monto</th><th class="pb-3">Probabilidad</th><th class="pb-3">Status</th></tr></thead>
+            <tbody class="text-gray-600">
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs font-bold text-[#0A1F44]">CLM-004</td><td class="py-3">Stand-by equipos pesados</td><td class="py-3"><span class="px-2 py-0.5 bg-[#E8631D]/10 text-[#E8631D] text-[10px] font-bold rounded">Delay</span></td><td class="py-3 font-mono font-bold">US$ 1.2M</td><td class="py-3"><div class="w-20 h-2 bg-gray-100 rounded-full"><div class="h-full bg-[#E8631D] rounded-full" style="width:85%"></div></div><span class="text-xs text-gray-400">85%</span></td><td class="py-3"><span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">Negociacion</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs font-bold text-[#0A1F44]">CLM-003</td><td class="py-3">Perdida productividad acceso</td><td class="py-3"><span class="px-2 py-0.5 bg-[#0A1F44]/10 text-[#0A1F44] text-[10px] font-bold rounded">Disruption</span></td><td class="py-3 font-mono font-bold">US$ 850K</td><td class="py-3"><div class="w-20 h-2 bg-gray-100 rounded-full"><div class="h-full bg-emerald-500 rounded-full" style="width:100%"></div></div><span class="text-xs text-gray-400">100%</span></td><td class="py-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded">Aprobado</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs font-bold text-[#0A1F44]">CLM-005</td><td class="py-3">Variacion cantidades cubicacion</td><td class="py-3"><span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-bold rounded">Variation</span></td><td class="py-3 font-mono font-bold">US$ 420K</td><td class="py-3"><div class="w-20 h-2 bg-gray-100 rounded-full"><div class="h-full bg-[#0A1F44] rounded-full" style="width:70%"></div></div><span class="text-xs text-gray-400">70%</span></td><td class="py-3"><span class="px-2 py-0.5 bg-[#E8631D]/10 text-[#E8631D] text-[10px] font-bold rounded">Presentado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- TAB: OPERACIONAL -->
+    <div id="tab-ops" class="tab-content hidden">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Wrench Time</span><p class="mono text-2xl font-black text-[#0A1F44] mt-2">68%</p><p class="text-gray-400 text-xs">vs. 55% baseline (+13%)</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">HH Ejecutadas</span><p class="mono text-2xl font-black text-[#E8631D] mt-2">12,450</p><p class="text-gray-400 text-xs">Este mes</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Equipos Activos</span><p class="mono text-2xl font-black text-[#1B998B] mt-2">34</p><p class="text-gray-400 text-xs">3 en standby</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Productividad</span><p class="mono text-2xl font-black text-[#1a1a1a] mt-2">92%</p><p class="text-red-500 text-xs">vs. 100% target (-8%)</p></div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Wrench Time por Turno</h3>
+          <div style="height: 200px;"><canvas id="wrenchChart"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Productividad por Frente</h3>
+          <div style="height: 200px;"><canvas id="productividadChart"></canvas></div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-100">
+        <h3 class="font-bold text-[#1a1a1a] mb-4">Daily Report - Ultimos 7 dias</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-100"><th class="pb-3">Fecha</th><th class="pb-3">HH</th><th class="pb-3">Avance %</th><th class="pb-3">Equipos</th><th class="pb-3">Eventos</th><th class="pb-3">Clima</th></tr></thead>
+            <tbody class="text-gray-600">
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs">25 Abr 2026</td><td class="py-3">420</td><td class="py-3"><span class="text-emerald-600 font-bold">4.2%</span></td><td class="py-3">8</td><td class="py-3 text-gray-400">-</td><td class="py-3"><span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] rounded">Soleado</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs">24 Abr 2026</td><td class="py-3">380</td><td class="py-3"><span class="text-amber-600 font-bold">3.1%</span></td><td class="py-3">7</td><td class="py-3"><span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] rounded">Stand-by 2h</span></td><td class="py-3"><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded">Nublado</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs">23 Abr 2026</td><td class="py-3">445</td><td class="py-3"><span class="text-emerald-600 font-bold">4.5%</span></td><td class="py-3">9</td><td class="py-3 text-gray-400">-</td><td class="py-3"><span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] rounded">Soleado</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="py-3 font-mono text-xs">22 Abr 2026</td><td class="py-3">210</td><td class="py-3"><span class="text-red-600 font-bold">1.8%</span></td><td class="py-3">4</td><td class="py-3"><span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] rounded">Lluvia</span></td><td class="py-3"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded">Lluvia</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PAGOS -->
+    <div id="tab-pagos" class="tab-content hidden">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">EDP Actual</span><p class="mono text-2xl font-black text-[#0A1F44] mt-2">US$ 2.4M</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Retenciones</span><p class="mono text-2xl font-black text-[#E8631D] mt-2">10%</p><p class="text-gray-400 text-xs">US$ 240K retenido</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Valorizacion</span><p class="mono text-2xl font-black text-[#1B998B] mt-2">US$ 1.8M</p></div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100"><span class="text-gray-400 text-xs font-bold uppercase">Dias Pago</span><p class="mono text-2xl font-black text-[#1a1a1a] mt-2">15</p><p class="text-gray-400 text-xs">vs. 30 contrato</p></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-100 mb-6">
+        <h3 class="font-bold text-[#1a1a1a] mb-4">Evolucion Estados de Pago</h3>
+        <div style="height: 180px;"><canvas id="pagosChart"></canvas></div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Conciliacion Avance vs. Pago</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">Avance Fisico</span><span class="font-bold text-[#0A1F44]">42.3%</span></div>
+              <div class="w-full h-3 bg-gray-100 rounded-full"><div class="h-full bg-[#0A1F44] rounded-full" style="width:42.3%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">Avance Facturado</span><span class="font-bold text-[#E8631D]">38.7%</span></div>
+              <div class="w-full h-3 bg-gray-100 rounded-full"><div class="h-full bg-[#E8631D] rounded-full" style="width:38.7%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">Avance Programado</span><span class="font-bold text-emerald-600">45.0%</span></div>
+              <div class="w-full h-3 bg-gray-100 rounded-full"><div class="h-full bg-emerald-500 rounded-full" style="width:45%"></div></div>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+              <p class="text-sm text-gray-500">Gap facturacion vs. fisico: <span class="text-red-600 font-bold">-3.6%</span> - <span class="text-red-600 font-bold">US$ 180K</span> sin facturar</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-[#1a1a1a] mb-4">Proximos Hitos de Pago</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 border-l-4 border-emerald-500">
+              <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs font-bold">15</div>
+              <div class="flex-1"><p class="text-sm font-semibold text-emerald-700">EDP #12 - Abril 2026</p><p class="text-xs text-emerald-500">US$ 2.4M - Aprobado por mandante</p></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-amber-50 border-l-4 border-amber-500">
+              <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 text-xs font-bold">30</div>
+              <div class="flex-1"><p class="text-sm font-semibold text-amber-700">EDP #13 - Mayo 2026</p><p class="text-xs text-amber-500">Estimado US$ 2.8M - En preparacion</p></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+              <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 text-xs font-bold">Q3</div>
+              <div class="flex-1"><p class="text-sm font-semibold text-gray-700">Liberacion Retenciones 5%</p><p class="text-xs text-gray-500">US$ 1.2M - Post-handover</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+function showTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById('tab-' + tabName).classList.remove('hidden');
+  document.querySelectorAll('.sidebar-link').forEach(el => { el.classList.remove('active'); el.style.borderLeftColor = 'transparent'; });
+  const btn = document.getElementById('btn-' + tabName);
+  if (btn) { btn.classList.add('active'); btn.style.borderLeftColor = '#E8631D'; }
+  // Update header title
+  const titles = { overview: 'Overview', planning: 'Planificacion', ot: 'Oficina Tecnica', claims: 'Claims', ops: 'Operacional', pagos: 'Estados de Pago' };
+  document.querySelector('header h1').innerHTML = 'Dashboard <span class="text-[#E8631D]">' + titles[tabName] + '</span>';
+}
+
+// Curva S
+new Chart(document.getElementById('curvaSChart'), {
+  type: 'line',
+  data: {
+    labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+    datasets: [
+      { label: 'Plan', data: [8,15,25,35,48,58,68,75,82,88,94,100], borderColor: '#0A1F44', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4 },
+      { label: 'Actual', data: [7,13,22,30,38,45,52,58,63,68,72,75], borderColor: '#E8631D', backgroundColor: 'rgba(232,99,29,0.1)', borderWidth: 2, tension: 0.4, fill: true },
+      { label: 'Forecast', data: [null,null,null,null,null,null,null,null,63,70,78,85], borderColor: '#1B998B', borderDash: [5,5], borderWidth: 2, tension: 0.4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true } } }, scales: { y: { max: 100, ticks: { callback: v => v + '%' } } } }
+});
+
+// Claims Pie
+new Chart(document.getElementById('claimsPieChart'), {
+  type: 'doughnut',
+  data: { labels: ['Presentados','En Negociacion','Aprobados','Rechazados'], datasets: [{ data: [3.2,1.6,2.1,0.8], backgroundColor: ['#0A1F44','#E8631D','#1B998B','#ccc'] }] },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } } }
+});
+
+// SPI/CPI Trend
+new Chart(document.getElementById('spitrendChart'), {
+  type: 'line',
+  data: {
+    labels: ['S1','S2','S3','S4','S5','S6','S7','S8','S9','S10','S11','S12'],
+    datasets: [
+      { label: 'SPI', data: [1.02,0.98,0.95,0.92,0.89,0.91,0.88,0.90,0.93,0.95,0.92,0.94], borderColor: '#0A1F44', borderWidth: 2, tension: 0.3 },
+      { label: 'CPI', data: [1.05,1.02,0.98,0.94,0.90,0.88,0.85,0.86,0.87,0.85,0.86,0.87], borderColor: '#E8631D', borderWidth: 2, tension: 0.3 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true } } }, scales: { y: { min: 0.7, max: 1.2 } } }
+});
+
+// Margen Mensual
+new Chart(document.getElementById('margenChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Ene','Feb','Mar','Abr','May','Jun'],
+    datasets: [
+      { label: 'Margen %', data: [18.5,17.2,16.8,15.1,14.2,12.3], backgroundColor: '#E8631D', borderRadius: 6 },
+      { label: 'Baseline %', data: [18.5,18.5,18.5,18.5,18.5,18.5], backgroundColor: '#0A1F4420', borderRadius: 6 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true } } } }
+});
+
+// Gantt
+new Chart(document.getElementById('ganttChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Mov. Tierra','Fundaciones','Estructural','Mecanico','Electrico','Instrumentacion','Pipping','Comisionamiento'],
+    datasets: [
+      { label: 'Plan %', data: [100,85,60,45,30,15,10,0], backgroundColor: '#0A1F44', borderRadius: 4 },
+      { label: 'Actual %', data: [100,78,45,32,20,8,5,0], backgroundColor: '#E8631D', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { position: 'top' } } }
+});
+
+// RFI Chart
+new Chart(document.getElementById('rfiChart'), {
+  type: 'doughnut',
+  data: { labels: ['Respondidos','Pendientes','Vencidos','Escalados'], datasets: [{ data: [62,28,24,10], backgroundColor: ['#1B998B','#0A1F44','#E8631D','#D4AF37'] }] },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } } }
+});
+
+// Submittal Chart
+new Chart(document.getElementById('submittalChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Civil','Estructural','Mecanico','Electrico','Pipping','Instrumentacion'],
+    datasets: [
+      { label: 'Aprobados', data: [28,18,12,8,6,4], backgroundColor: '#1B998B', borderRadius: 4 },
+      { label: 'Pendientes', data: [5,8,10,6,4,3], backgroundColor: '#E8631D', borderRadius: 4 },
+      { label: 'Rechazados', data: [2,1,3,2,1,0], backgroundColor: '#ccc', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+});
+
+// Claims Trend
+new Chart(document.getElementById('claimsTrendChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2024 Q1','2024 Q2','2024 Q3','2024 Q4','2025 Q1','2025 Q2','2025 Q3','2025 Q4','2026 Q1','2026 Q2'],
+    datasets: [
+      { label: 'Presentados', data: [0.8,1.2,0.5,1.5,0.3,0.9,1.1,0.7,1.2,0.8], backgroundColor: '#0A1F44', borderRadius: 4 },
+      { label: 'Aprobados', data: [0.3,0.5,0.2,0.8,0.1,0.4,0.6,0.3,0.9,0.4], backgroundColor: '#1B998B', borderRadius: 4 },
+      { label: 'En Negociacion', data: [0.5,0.7,0.3,0.7,0.2,0.5,0.5,0.4,0.3,0.4], backgroundColor: '#E8631D', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
+});
+
+// Wrench Time
+new Chart(document.getElementById('wrenchChart'), {
+  type: 'line',
+  data: {
+    labels: ['Lun','Mar','Mie','Jue','Vie','Sab','Dom'],
+    datasets: [
+      { label: 'Wrench Time %', data: [65,68,72,70,66,45,0], borderColor: '#0A1F44', backgroundColor: 'rgba(10,31,68,0.1)', borderWidth: 2, fill: true, tension: 0.3 },
+      { label: 'Target', data: [70,70,70,70,70,50,0], borderColor: '#1B998B', borderDash: [5,5], borderWidth: 2, tension: 0.3 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+});
+
+// Productividad
+new Chart(document.getElementById('productividadChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Mov. Tierra','Fundaciones','Estructural','Mecanico','Electrico','Pipping'],
+    datasets: [
+      { label: 'Actual %', data: [95,88,72,85,78,65], backgroundColor: '#0A1F44', borderRadius: 6 },
+      { label: 'Target %', data: [100,95,85,90,85,80], backgroundColor: '#E8631D30', borderRadius: 6 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+});
+
+// Pagos Chart
+new Chart(document.getElementById('pagosChart'), {
+  type: 'line',
+  data: {
+    labels: ['EDP 1','EDP 2','EDP 3','EDP 4','EDP 5','EDP 6','EDP 7','EDP 8','EDP 9','EDP 10','EDP 11','EDP 12'],
+    datasets: [
+      { label: 'EDP Aprobado', data: [1.2,1.5,1.8,1.6,2.0,1.9,2.2,2.1,2.3,2.0,2.5,2.4], borderColor: '#0A1F44', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3 },
+      { label: 'Retencion 10%', data: [0.12,0.15,0.18,0.16,0.20,0.19,0.22,0.21,0.23,0.20,0.25,0.24], borderColor: '#E8631D', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+});
+</script>
+
+</body>
+</html>
